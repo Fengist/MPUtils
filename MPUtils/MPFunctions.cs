@@ -146,6 +146,123 @@ namespace MPUtils
     public static class MPFunctions
     {
 
+        private static FieldInfo windowListField;
+
+        public static List<int> parseIntegers(string stringOfInts)
+        {
+            List<int> newIntList = new List<int>();
+            string[] valueArray = stringOfInts.Split(';');
+            for (int i = 0; i < valueArray.Length; i++)
+            {
+                int newValue = 0;
+                if (int.TryParse(valueArray[i], out newValue))
+                {
+                    newIntList.Add(newValue);
+                }
+                else
+                {
+                    Debug.Log("invalid integer: " + valueArray[i]);
+                }
+            }
+            return newIntList;
+        }
+
+        public static UIPartActionWindow FindActionWindow(this Part part)
+        {
+            if (part == null)
+                return null;
+
+            // We need to do quite a bit of piss-farting about with reflection to 
+            // dig the thing out. We could just use Object.Find, but that requires hitting a heap more objects.
+            UIPartActionController controller = UIPartActionController.Instance;
+            if (controller == null)
+                return null;
+
+            if (windowListField == null)
+            {
+                Type cntrType = typeof(UIPartActionController);
+                foreach (FieldInfo info in cntrType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic))
+                {
+                    if (info.FieldType == typeof(List<UIPartActionWindow>))
+                    {
+                        windowListField = info;
+                        goto foundField;
+                    }
+                }
+                Debug.LogWarning("*PartUtils* Unable to find UIPartActionWindow list");
+                return null;
+            }
+        foundField:
+
+            List<UIPartActionWindow> uiPartActionWindows = (List<UIPartActionWindow>)windowListField.GetValue(controller);
+            if (uiPartActionWindows == null)
+                return null;
+
+            return uiPartActionWindows.FirstOrDefault(window => window != null && window.part == part);
+        }
+        public static List<string> parseNames(string names)
+        {
+            return parseNames(names, false, true, string.Empty);
+        }
+
+        public static List<string> parseNames(string names, bool replaceBackslashErrors)
+        {
+            return parseNames(names, replaceBackslashErrors, true, string.Empty);
+        }
+
+        public static List<string> parseNames(string names, bool replaceBackslashErrors, bool trimWhiteSpace, string prefix)
+        {
+            List<string> source = names.Split(';').ToList<string>();
+            for (int i = source.Count - 1; i >= 0; i--)
+            {
+                if (source[i] == string.Empty)
+                {
+                    source.RemoveAt(i);
+                }
+            }
+            if (trimWhiteSpace)
+            {
+                for (int i = 0; i < source.Count; i++)
+                {
+                    source[i] = source[i].Trim(' ');
+                }
+            }
+            if (prefix != string.Empty)
+            {
+                for (int i = 0; i < source.Count; i++)
+                {
+                    source[i] = prefix + source[i];
+                }
+            }
+            if (replaceBackslashErrors)
+            {
+                for (int i = 0; i < source.Count; i++)
+                {
+                    source[i] = source[i].Replace('\\', '/');
+                }
+            }
+            return source.ToList<string>();
+        }
+
+        public static List<double> parseDoubles(string stringOfDoubles)
+        {
+            System.Collections.Generic.List<double> list = new System.Collections.Generic.List<double>();
+            string[] array = stringOfDoubles.Trim().Split(';');
+            for (int i = 0; i < array.Length; i++)
+            {
+                double item = 0f;
+                if (double.TryParse(array[i].Trim(), out item))
+                {
+                    list.Add(item);
+                }
+                else
+                {
+                    Debug.Log("FStools: invalid float: [len:" + array[i].Length + "] '" + array[i] + "']");
+                }
+            }
+            return list;
+        }
+
         public static string GetVersion()
         {
     

@@ -38,7 +38,7 @@ namespace MPUtils
         }
     }
 
-    [KSPAddon(KSPAddon.Startup.MainMenu, true)]
+    [KSPAddon(KSPAddon.Startup.EditorAny, true)]
     public class KerbalElectricFilter : BaseFilter
     {
         protected override string Manufacturer
@@ -99,26 +99,27 @@ namespace MPUtils
         private Icon GenIcon(string iconName)
         {
 
-            var normIcon = new Texture2D(32, 32, TextureFormat.RGBA32, false);
-            var normIconFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), iconName + "_off.png"); // icon to be present in same folder as dll
-            WWW www = new WWW(normIconFile);
-            www.LoadImageIntoTexture(normIcon);
-            //normIcon = www.texture;
-            //normIcon.LoadRawTextureData(File.ReadAllBytes(normIconFile));
-            normIcon.Apply();
+            //var normIcon = new Texture2D(32, 32, TextureFormat.RGBA32, false);
+            //var normIconFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), iconName + "_off.png"); // icon to be present in same folder as dll
+            //WWW www = new WWW(normIconFile);
+            //www.LoadImageIntoTexture(normIcon);
+            ////normIcon = www.texture;
+            ////normIcon.LoadRawTextureData(File.ReadAllBytes(normIconFile));
+            //normIcon.Apply();
 
-            var selIcon = new Texture2D(32, 32, TextureFormat.RGBA32, false);
-            var selIconFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), iconName + "_on.png");// icon to be present in same folder as dll
-            www = new WWW(selIconFile);
-            www.LoadImageIntoTexture(selIcon);
-            //selIcon = www.texture;
-            //selIcon.LoadRawTextureData(File.ReadAllBytes(selIconFile));
-            selIcon.Apply();
-            www.Dispose();
+            //var selIcon = new Texture2D(32, 32, TextureFormat.RGBA32, false);
+            //var selIconFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), iconName + "_on.png");// icon to be present in same folder as dll
+            //www = new WWW(selIconFile);
+            //www.LoadImageIntoTexture(selIcon);
+            ////selIcon = www.texture;
+            ////selIcon.LoadRawTextureData(File.ReadAllBytes(selIconFile));
+            //selIcon.Apply();
+            //www.Dispose();
 
-            print("*****Adding icon for " + categoryTitle);
-            var icon = new Icon(iconName + "Icon", normIcon, selIcon);
-            return icon;
+            //print("*****Adding icon for " + categoryTitle);
+            //var icon = new Icon(iconName + "Icon", normIcon, selIcon);
+            //return icon;
+            return null;
 
             //This works but with Unity possibly moving LoadIcon I'm going with the www solution.
             //var normIcon = new Texture2D(64, 64, TextureFormat.RGBA32, false);

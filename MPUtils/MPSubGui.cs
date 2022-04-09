@@ -1,6 +1,5 @@
 ﻿/*********************************************************************************************
 * The Maritime Pack MPUtil plugin is copyright 2015 Fengist, all rights reserved.
-* For full license information please visit http://www.kerbaltopia.com
 *********************************************************************************************/
 
 using System;

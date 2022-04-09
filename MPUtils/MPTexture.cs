@@ -1,4 +1,9 @@
-﻿using System;
+﻿using MaritimePack.customization;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
+using UnityEngine;
 
 namespace MPUtils
 {
@@ -63,11 +68,9 @@ namespace MPUtils
         private List<String> objectList = new List<string>();
         private List<String> textureDisplayList = new List<string>();
         private List<int> fuelTankSetupList = new List<int>();
-        private FSfuelSwitch fuelSwitch;
+        private MPfuelSwitch fuelSwitch;
 
         private bool initialized = false;
-
-        FSdebugMessages debug;
 
         [KSPField(guiActiveEditor = true, guiName = "Current Texture")]
         public string currentTextureName = string.Empty;
@@ -127,7 +130,7 @@ namespace MPUtils
                 for (int i = 0; i < part.symmetryCounterparts.Count; i++)
                 {
                     // check that the moduleID matches to make sure we don't target the wrong tex switcher
-                    FStextureSwitch2[] symSwitch = part.symmetryCounterparts[i].GetComponents<FStextureSwitch2>();
+                    MPtextureSwitch2[] symSwitch = part.symmetryCounterparts[i].GetComponents<MPtextureSwitch2>();
                     for (int j = 0; j < symSwitch.Length; j++)
                     {
                         if (symSwitch[j].moduleID == moduleID)
@@ -152,11 +155,8 @@ namespace MPUtils
             }
             if (useFuelSwitchModule)
             {
-                debug.debugMessage("calling on FSfuelSwitch tank setup " + selectedTexture);
                 if (selectedTexture < fuelTankSetupList.Count)
                     fuelSwitch.selectTankSetup(fuelTankSetupList[selectedTexture], calledByPlayer);
-                else
-                    debug.debugMessage("no such fuel tank setup");
                 if (calledByPlayer && HighLogic.LoadedSceneIsFlight)
                 {
                     //Do a screeen message of what we just swapped to!
@@ -174,48 +174,20 @@ namespace MPUtils
 
                 useMap(targetMat);
             }
-            else
-            {
-                debug.debugMessage("No target material in object.");
-            }
         }
 
         private void useMap(Material targetMat)
         {
-            debug.debugMessage("maplist count: " + mapList.Count + ", selectedTexture: " + selectedTexture + ", texlist Count: " + texList.Count);
             if (mapList.Count > selectedTexture)
             {
                 if (GameDatabase.Instance.ExistsTexture(mapList[selectedTexture]))
                 {
-                    debug.debugMessage("map " + mapList[selectedTexture] + " exists in db");
                     targetMat.SetTexture(additionalMapType, GameDatabase.Instance.GetTexture(mapList[selectedTexture], mapIsNormal));
                     selectedMapURL = mapList[selectedTexture];
 
                     if (selectedTexture < textureDisplayList.Count && texList.Count == 0)
                     {
                         currentTextureName = textureDisplayList[selectedTexture];
-                        debug.debugMessage("setting currentTextureName to " + textureDisplayList[selectedTexture]);
-                    }
-                    else
-                    {
-                        debug.debugMessage("not setting currentTextureName. selectedTexture is " + selectedTexture + ", texDispList count is" + textureDisplayList.Count + ", texList count is " + texList.Count);
-                    }
-                }
-                else
-                {
-                    debug.debugMessage("map " + mapList[selectedTexture] + " does not exist in db");
-                }
-            }
-            else
-            {
-                if (mapList.Count > selectedTexture) // why is this check here? will never happen.
-                    debug.debugMessage("no such map: " + mapList[selectedTexture]);
-                else
-                {
-                    debug.debugMessage("useMap, index out of range error, maplist count: " + mapList.Count + ", selectedTexture: " + selectedTexture);
-                    for (int i = 0; i < mapList.Count; i++)
-                    {
-                        debug.debugMessage("map " + i + ": " + mapList[i]);
                     }
                 }
             }
@@ -227,7 +199,6 @@ namespace MPUtils
             {
                 if (GameDatabase.Instance.ExistsTexture(texList[selectedTexture]))
                 {
-                    debug.debugMessage("assigning texture: " + texList[selectedTexture]);
                     targetMat.mainTexture = GameDatabase.Instance.GetTexture(texList[selectedTexture], false);
                     selectedTextureURL = texList[selectedTexture];
 
@@ -235,10 +206,6 @@ namespace MPUtils
                         currentTextureName = getTextureDisplayName(texList[selectedTexture]);
                     else
                         currentTextureName = textureDisplayList[selectedTexture];
-                }
-                else
-                {
-                    debug.debugMessage("no such texture: " + texList[selectedTexture]);
                 }
             }
         }
@@ -250,13 +217,13 @@ namespace MPUtils
                 List<string> variantList;
                 if (textureNames.Length > 0)
                 {
-                    variantList = Tools.parseNames(textureNames);
+                    variantList = MPFunctions.parseNames(textureNames);
                 }
                 else
                 {
-                    variantList = Tools.parseNames(mapNames);
+                    variantList = MPFunctions.parseNames(mapNames);
                 }
-                textureDisplayList = Tools.parseNames(textureDisplayNames);
+                textureDisplayList = MPFunctions.parseNames(textureDisplayNames);
                 StringBuilder info = new StringBuilder();
                 info.AppendLine("Alternate textures available:");
                 if (variantList.Count == 0)
@@ -311,17 +278,14 @@ namespace MPUtils
         {
             if (!initialized)
             {
-                debug = new FSdebugMessages(debugMode, "FStextureSwitch2");
                 // you can't have fuel switching without symmetry, it breaks the editor GUI.
                 if (useFuelSwitchModule) updateSymmetry = true;
 
-                objectList = Tools.parseNames(objectNames, true);
-                texList = Tools.parseNames(textureNames, true, true, textureRootFolder);
-                mapList = Tools.parseNames(mapNames, true, true, textureRootFolder);
-                textureDisplayList = Tools.parseNames(textureDisplayNames);
-                fuelTankSetupList = Tools.parseIntegers(fuelTankSetups);
-
-                debug.debugMessage("found " + texList.Count + " textures, using number " + selectedTexture + ", found " + objectList.Count + " objects, " + mapList.Count + " maps");
+                objectList = MPFunctions.parseNames(objectNames, true);
+                texList = MPFunctions.parseNames(textureNames, true, true, textureRootFolder);
+                mapList = MPFunctions.parseNames(mapNames, true, true, textureRootFolder);
+                textureDisplayList = MPFunctions.parseNames(textureDisplayNames);
+                fuelTankSetupList = MPFunctions.parseIntegers(fuelTankSetups);
 
                 foreach (String targetObjectName in objectList)
                 {
@@ -346,11 +310,10 @@ namespace MPUtils
 
                 if (useFuelSwitchModule)
                 {
-                    fuelSwitch = part.GetComponent<FSfuelSwitch>(); // only looking for first, not supporting multiple fuel switchers
+                    fuelSwitch = part.GetComponent<MPfuelSwitch>(); // only looking for first, not supporting multiple fuel switchers
                     if (fuelSwitch == null)
                     {
                         useFuelSwitchModule = false;
-                        debug.debugMessage("no FSfuelSwitch module found, despite useFuelSwitchModule being true");
                     }
                 }
                 initialized = true;
