@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace MPUtils
 {
-    public class MPtextureSwitch2 : PartModule
+    public class MPTextureSwitch : PartModule
     {
         [KSPField]
         public int moduleID = 0;
@@ -130,7 +130,7 @@ namespace MPUtils
                 for (int i = 0; i < part.symmetryCounterparts.Count; i++)
                 {
                     // check that the moduleID matches to make sure we don't target the wrong tex switcher
-                    MPtextureSwitch2[] symSwitch = part.symmetryCounterparts[i].GetComponents<MPtextureSwitch2>();
+                    MPTextureSwitch[] symSwitch = part.symmetryCounterparts[i].GetComponents<MPTextureSwitch>();
                     for (int j = 0; j < symSwitch.Length; j++)
                     {
                         if (symSwitch[j].moduleID == moduleID)

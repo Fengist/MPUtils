@@ -7,8 +7,52 @@ using UnityEngine;
 
 namespace MPUtils
 {
+    [KSPAddon(KSPAddon.Startup.EditorAny, true)]
+    public class KerbalElectricFilter : BaseFilter
+    {
+        protected override string Manufacturer
+        {
+            get { return "Kerbal Electric"; }
+            set { }
+        }
+        protected override string categoryTitle
+        {
+            get { return "Kerbal Electric"; }
+            set { }
+        }
+    }
 
-    [KSPAddon(KSPAddon.Startup.MainMenu, true)]
+    [KSPAddon(KSPAddon.Startup.EditorAny, true)]
+    public class FontFactoryFilter : BaseFilter
+    {
+        protected override string Manufacturer
+        {
+            get { return "Fengist's Font Factory - Zero Hour"; }
+            set { }
+        }
+        protected override string categoryTitle
+        {
+            get { return "Fonts"; }
+            set { }
+        }
+    }
+
+    [KSPAddon(KSPAddon.Startup.EditorAny, true)]
+    public class LTAFilter : BaseFilter
+    {
+        protected override string Manufacturer
+        {
+            get { return "Fengist's Balloon and Mattress Factory"; }// part manufacturer in cfgs and agents files 
+            set { }
+        }
+        protected override string categoryTitle
+        {
+            get { return "Lighter than Air"; } // the category name 
+            set { }
+        }
+    }
+
+    [KSPAddon(KSPAddon.Startup.EditorAny, true)]
     public class MPFilter : BaseFilter
     {
         protected override string Manufacturer
@@ -23,7 +67,7 @@ namespace MPUtils
         }
     }
 
-    [KSPAddon(KSPAddon.Startup.MainMenu, true)]
+    [KSPAddon(KSPAddon.Startup.EditorAny, true)]
     public class SteampunkFilter : BaseFilter
     {
         protected override string Manufacturer
@@ -34,21 +78,6 @@ namespace MPUtils
         protected override string categoryTitle
         {
             get { return "1869"; }
-            set { }
-        }
-    }
-
-    [KSPAddon(KSPAddon.Startup.EditorAny, true)]
-    public class KerbalElectricFilter : BaseFilter
-    {
-        protected override string Manufacturer
-        {
-            get { return "Kerbal Electric"; }
-            set { }
-        }
-        protected override string categoryTitle
-        {
-            get { return "Kerbal Electric"; }
             set { }
         }
     }
@@ -98,42 +127,20 @@ namespace MPUtils
 
         private Icon GenIcon(string iconName)
         {
+            Texture2D normIcon = new Texture2D(32, 32, TextureFormat.RGBA32, false), selIcon = new Texture2D(32, 32, TextureFormat.RGBA32, false);
+            var normIconFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), iconName + "_off.png"); // icon to be present in same folder as dll
+            var selIconFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), iconName + "_on.png");// icon to be present in same folder as dll
 
-            //var normIcon = new Texture2D(32, 32, TextureFormat.RGBA32, false);
-            //var normIconFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), iconName + "_off.png"); // icon to be present in same folder as dll
-            //WWW www = new WWW(normIconFile);
-            //www.LoadImageIntoTexture(normIcon);
-            ////normIcon = www.texture;
-            ////normIcon.LoadRawTextureData(File.ReadAllBytes(normIconFile));
-            //normIcon.Apply();
+            WWW www = new WWW(normIconFile);
+            www.LoadImageIntoTexture(normIcon);
+            normIcon.Apply();
+            www = new WWW(normIconFile);
+            www.LoadImageIntoTexture(selIcon);
+            selIcon.Apply();
+            www.Dispose();
 
-            //var selIcon = new Texture2D(32, 32, TextureFormat.RGBA32, false);
-            //var selIconFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), iconName + "_on.png");// icon to be present in same folder as dll
-            //www = new WWW(selIconFile);
-            //www.LoadImageIntoTexture(selIcon);
-            ////selIcon = www.texture;
-            ////selIcon.LoadRawTextureData(File.ReadAllBytes(selIconFile));
-            //selIcon.Apply();
-            //www.Dispose();
-
-            //print("*****Adding icon for " + categoryTitle);
-            //var icon = new Icon(iconName + "Icon", normIcon, selIcon);
-            //return icon;
-            return null;
-
-            //This works but with Unity possibly moving LoadIcon I'm going with the www solution.
-            //var normIcon = new Texture2D(64, 64, TextureFormat.RGBA32, false);
-            //var normIconFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), iconName + "_on.png");
-            //normIcon.LoadImage(File.ReadAllBytes(normIconFile));
-
-            //var selIcon = new Texture2D(64, 64, TextureFormat.RGBA32, false);
-            //var selIconFile = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), iconName + "_off.png");
-            //selIcon.LoadImage(File.ReadAllBytes(selIconFile));
-
-            //print("*****Adding icon for " + categoryTitle);
-            //var icon = new Icon(iconName + "Icon", normIcon, selIcon);
-            //return icon;
-
+            var icon = new Icon(iconName + "Icon", normIcon, selIcon);
+            return icon;
         }
     }
 
